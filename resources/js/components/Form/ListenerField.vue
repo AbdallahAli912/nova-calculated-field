@@ -9,6 +9,7 @@
             :id="field.attribute"
             :dusk="field.attribute"
             v-bind="extraAttributes"
+            :step="field.step"
             :disabled="isReadonly"
             :list="`${field.attribute}-list`"
         />
@@ -23,14 +24,18 @@
               :value="suggestion"
           />
         </datalist>
-          <input type="button" class="btn btn-default btn-primary ml-3 cursor-pointer" value="Calculate" :id="field.attribute.concat('CalculateButton')" v-on:click="calculateValue(true);">
+          <input type="button"
+                 v-if="this.field.buttonVisible"
+                 class="btn btn-default btn-primary ml-3 cursor-pointer"
+                 value="Calculate" :id="field.attribute.concat('CalculateButton')"
+                 v-on:click="calculateValue(true);">
       </div>
     </template>
   </default-field>
 </template>
 
 <script>
-import { FormField, HandlesValidationErrors } from 'laravel-nova'
+import {FormField, HandlesValidationErrors} from 'laravel-nova'
 
 export default {
   mixins: [HandlesValidationErrors, FormField],
@@ -50,9 +55,8 @@ export default {
       this.calculateValue()
     },
 
-    calculateValue: function (force = false) {
+calculateValue: function (force = false) {
       this.calculating = true;
-
       Nova.request().post(
           `/gldrenthe89/nova-calculated-field/calculate/${this.resourceName}/${this.field.attribute}`,
           this.field_values
@@ -81,6 +85,7 @@ export default {
      */
     setInitialValue() {
       this.value = this.field.value || ''
+      this.emitValue(this.value);
     },
 
     /**
