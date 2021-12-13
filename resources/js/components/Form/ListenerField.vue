@@ -50,25 +50,27 @@ export default {
       this.calculateValue()
     },
 
-    calculateValue: _.debounce(function (force = false) {
+    calculateValue: function (force = false) {
       this.calculating = true;
 
       Nova.request().post(
           `/gldrenthe89/nova-calculated-field/calculate/${this.resourceName}/${this.field.attribute}`,
           this.field_values
       ).then((response) => {
-        if (
+          alert("hi there");
+          if (
             !(response.data.disabled && this.field.isUpdating)
             ||
             force
         ) {
           this.value = response.data.value
+          this.emitValue(this.value);
         }
         this.calculating = false;
       }).catch(() => {
         this.calculating = false;
       });
-    }, 500),
+    },
 
     showButton() {
       return false;
