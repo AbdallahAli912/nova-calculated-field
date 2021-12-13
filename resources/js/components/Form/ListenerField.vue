@@ -61,7 +61,6 @@ calculateValue: function (force = false) {
           `/gldrenthe89/nova-calculated-field/calculate/${this.resourceName}/${this.field.attribute}`,
           this.field_values
       ).then((response) => {
-          alert("hi there");
           if (
             !(response.data.disabled && this.field.isUpdating)
             ||
