@@ -24,11 +24,11 @@
               :value="suggestion"
           />
         </datalist>
-          <input type="button"
-                 v-if="this.field.buttonVisible"
-                 class="btn btn-default btn-primary ml-3 cursor-pointer"
-                 value="Calculate" :id="field.attribute.concat('CalculateButton')"
-                 v-on:click="calculateValue(true);">
+        <input type="button"
+               v-if="this.field.buttonVisible"
+               class="btn btn-default btn-primary ml-3 cursor-pointer"
+               value="Calculate" :id="field.attribute.concat('CalculateButton')"
+               v-on:click="calculateValue(true);">
       </div>
     </template>
   </default-field>
@@ -55,13 +55,33 @@ export default {
       this.calculateValue()
     },
 
-calculateValue: function (force = false) {
+    emitValue(value) {
+      if (this.field.broadcastTo == null) return;
+
+      let attribute = this.field.attribute
+      if (Array.isArray(this.field.broadcastTo)) {
+        this.field.broadcastTo.forEach(function (broadcastChannel) {
+          Nova.$emit(broadcastChannel, {
+            'field_name': attribute,
+            'value': value
+          })
+        });
+      } else {
+        Nova.$emit(this.field.broadcastTo, {
+          'field_name': attribute,
+          'value': value
+        })
+      }
+    },
+
+    calculateValue: function (force = false) {
       this.calculating = true;
+
       Nova.request().post(
           `/gldrenthe89/nova-calculated-field/calculate/${this.resourceName}/${this.field.attribute}`,
           this.field_values
       ).then((response) => {
-          if (
+        if (
             !(response.data.disabled && this.field.isUpdating)
             ||
             force
