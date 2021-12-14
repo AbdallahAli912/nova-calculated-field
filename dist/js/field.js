@@ -49158,6 +49158,24 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       this.field_values[message.field_name] = message.value;
       this.calculateValue();
     },
+    emitValue: function emitValue(value) {
+      if (this.field.broadcastTo == null) return;
+
+      var attribute = this.field.attribute;
+      if (Array.isArray(this.field.broadcastTo)) {
+        this.field.broadcastTo.forEach(function (broadcastChannel) {
+          Nova.$emit(broadcastChannel, {
+            'field_name': attribute,
+            'value': value
+          });
+        });
+      } else {
+        Nova.$emit(this.field.broadcastTo, {
+          'field_name': attribute,
+          'value': value
+        });
+      }
+    },
 
 
     calculateValue: function calculateValue() {
@@ -49166,6 +49184,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       var force = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
       this.calculating = true;
+
       Nova.request().post('/gldrenthe89/nova-calculated-field/calculate/' + this.resourceName + '/' + this.field.attribute, this.field_values).then(function (response) {
         if (!(response.data.disabled && _this.field.isUpdating) || force) {
           _this.value = response.data.value;
